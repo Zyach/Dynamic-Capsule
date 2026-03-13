@@ -4,6 +4,15 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
 }
 
+def baseVersionCode = 5
+def baseVersionName = '1.0.4'
+def ciVersionCode = System.getenv('VERSION_CODE')?.toInteger()
+def ciVersionName = System.getenv('VERSION_NAME')
+def ciKeystorePath = System.getenv('ANDROID_KEYSTORE_PATH')
+def ciKeystorePassword = System.getenv('ANDROID_KEYSTORE_PASSWORD')
+def ciKeyAlias = System.getenv('ANDROID_KEY_ALIAS')
+def ciKeyPassword = System.getenv('ANDROID_KEY_PASSWORD')
+
 android {
     namespace 'fr.angel.dynamicisland'
     compileSdk 36
@@ -12,8 +21,8 @@ android {
         applicationId "fr.angel.dynamicisland"
         minSdk 31
         targetSdk 36
-        versionCode 5
-        versionName '1.0.4'
+        versionCode ciVersionCode ?: baseVersionCode
+        versionName ciVersionName ?: baseVersionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -21,8 +30,22 @@ android {
         }
     }
 
+    signingConfigs {
+        if (ciKeystorePath && ciKeystorePassword && ciKeyAlias && ciKeyPassword) {
+            release {
+                storeFile file(ciKeystorePath)
+                storePassword ciKeystorePassword
+                keyAlias ciKeyAlias
+                keyPassword ciKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (signingConfigs.findByName('release') != null) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
