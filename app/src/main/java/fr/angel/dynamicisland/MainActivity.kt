@@ -23,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import fr.angel.dynamicisland.model.SETTINGS_KEY
 import fr.angel.dynamicisland.model.SETTINGS_THEME_INVERTED
 import fr.angel.dynamicisland.model.THEME_INVERTED
+import fr.angel.dynamicisland.model.sendInternalBroadcast
 import fr.angel.dynamicisland.navigation.*
 import fr.angel.dynamicisland.plugins.ExportedPlugins
 import fr.angel.dynamicisland.island.IslandSettings
@@ -54,7 +55,7 @@ class MainActivity : ComponentActivity() {
 
 		// Invert theme in app
 		settingsPreferences.edit().putBoolean(THEME_INVERTED, true).apply()
-		sendBroadcast(Intent(SETTINGS_THEME_INVERTED))
+		sendInternalBroadcast(SETTINGS_THEME_INVERTED)
 
 		setContent {
 			// Setup plugins
@@ -173,27 +174,27 @@ class MainActivity : ComponentActivity() {
 		super.onDestroy()
 		// Un-invert theme in app
 		settingsPreferences.edit().putBoolean(THEME_INVERTED, false).apply()
-		sendBroadcast(Intent(SETTINGS_THEME_INVERTED))
+		sendInternalBroadcast(SETTINGS_THEME_INVERTED)
 	}
 
 	override fun onStop() {
 		super.onStop()
 		// Un-invert theme in app
 		settingsPreferences.edit().putBoolean(THEME_INVERTED, false).apply()
-		sendBroadcast(Intent(SETTINGS_THEME_INVERTED))
+		sendInternalBroadcast(SETTINGS_THEME_INVERTED)
 	}
 
 	override fun onPause() {
 		super.onPause()
 		// Un-invert theme in app
 		settingsPreferences.edit().putBoolean(THEME_INVERTED, false).apply()
-		sendBroadcast(Intent(SETTINGS_THEME_INVERTED))
+		sendInternalBroadcast(SETTINGS_THEME_INVERTED)
 	}
 
 	override fun onResume() {
 		super.onResume()
 		// Invert theme in app
 		settingsPreferences.edit().putBoolean(THEME_INVERTED, true).apply()
-		sendBroadcast(Intent(SETTINGS_THEME_INVERTED))
+		sendInternalBroadcast(SETTINGS_THEME_INVERTED)
 	}
 }

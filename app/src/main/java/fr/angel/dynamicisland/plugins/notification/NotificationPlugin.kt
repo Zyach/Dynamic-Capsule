@@ -51,6 +51,7 @@ import fr.angel.dynamicisland.model.ACTION_CLOSE
 import fr.angel.dynamicisland.model.ACTION_OPEN_CLOSE
 import fr.angel.dynamicisland.model.NOTIFICATION_POSTED
 import fr.angel.dynamicisland.model.NOTIFICATION_REMOVED
+import fr.angel.dynamicisland.model.sendInternalBroadcast
 import fr.angel.dynamicisland.model.service.IslandOverlayService
 import fr.angel.dynamicisland.model.service.NotificationService
 import fr.angel.dynamicisland.plugins.BasePlugin
@@ -161,7 +162,7 @@ class NotificationPlugin(
 		val filter = IntentFilter()
 		filter.addAction(NOTIFICATION_POSTED)
 		filter.addAction(NOTIFICATION_REMOVED)
-		context.registerReceiver(mBroadcastReceiver, filter, Context.RECEIVER_EXPORTED)
+		context.registerReceiver(mBroadcastReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
 	}
 
 	@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
@@ -179,7 +180,7 @@ class NotificationPlugin(
 		val dismissState = rememberDismissState(
 			confirmStateChange = {
 				if (it == DismissValue.DismissedToStart || it == DismissValue.DismissedToEnd) {
-					context.sendBroadcast(Intent(ACTION_CLOSE))
+					context.sendInternalBroadcast(ACTION_CLOSE)
 				}
 				true
 			}
@@ -336,9 +337,9 @@ class NotificationPlugin(
 									val intent = action.actionIntent
 									intent.send()
 									// Remove notification
-									context.sendBroadcast(Intent(ACTION_CLOSE).apply {
-										putExtra("id", meta.id)
-									})
+					context.sendInternalBroadcast(ACTION_CLOSE) {
+						putExtra("id", meta.id)
+					}
 								},
 							) {
 								Text(
@@ -404,9 +405,9 @@ class NotificationPlugin(
 								RemoteInput.addResultsToIntent(action.remoteInputs, intent, bundle)
 								action.actionIntent.send(context, 0, intent)
 								// Remove notification
-								context.sendBroadcast(Intent(ACTION_CLOSE).apply {
+								context.sendInternalBroadcast(ACTION_CLOSE) {
 									putExtra("id", meta.id)
-								})
+								}
 							}) {
 								Icon(
 									imageVector = Icons.Default.Send,
@@ -423,9 +424,9 @@ class NotificationPlugin(
 	override fun onClick() {
 		val meta = notificationMeta.value ?: return
 		val context = host as? Context ?: return
-		val intent = Intent(ACTION_OPEN_CLOSE)
-		intent.putExtra("id", meta.id)
-		context.sendBroadcast(intent)
+		context.sendInternalBroadcast(ACTION_OPEN_CLOSE) {
+			putExtra("id", meta.id)
+		}
 	}
 
 	override fun onDestroy() {
@@ -506,7 +507,7 @@ class NotificationPlugin(
 	override fun onLeftSwipe() {
 		Log.d("Notification", "Left swipe")
 		val context = host as? Context ?: return
-		context.sendBroadcast(Intent(ACTION_CLOSE))
+		context.sendInternalBroadcast(ACTION_CLOSE)
 	}
 
 	override fun onRightSwipe() {}

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import fr.angel.dynamicisland.model.SETTINGS_CHANGED
 import fr.angel.dynamicisland.model.SETTINGS_KEY
+import fr.angel.dynamicisland.model.sendInternalBroadcast
 
 abstract class BasePlugin {
 	abstract val id: String
@@ -79,7 +80,7 @@ abstract class BasePlugin {
 			editor.putBoolean(id, enabled)
 			editor.apply()
 
-			context.sendBroadcast(Intent(SETTINGS_CHANGED))
+			context.sendInternalBroadcast(SETTINGS_CHANGED)
 			this.enabled.value = enabled
 
 			true

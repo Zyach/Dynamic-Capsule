@@ -59,7 +59,7 @@ class BatteryPlugin(
 	override fun onPluginCreate() {
 		val context = host as? Context ?: return
 		batteryReceiver = BatteryReceiver()
-		context.registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED), Context.RECEIVER_EXPORTED)
+		context.registerReceiver(batteryReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED), Context.RECEIVER_NOT_EXPORTED)
 
 		// Check for plugin internal settings
 		pluginSettings.values.forEach {

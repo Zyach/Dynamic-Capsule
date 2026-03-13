@@ -9,14 +9,9 @@ import fr.angel.dynamicisland.plugins.notification.NotificationPlugin
 
 class PluginManager(
     private val context: Context,
-    private val host: PluginHost
+    private val host: PluginHost,
+    private val allPlugins: List<BasePlugin> = defaultPlugins(),
 ) {
-    val allPlugins = listOf(
-        NotificationPlugin(),
-        MediaSessionPlugin(),
-        BatteryPlugin()
-    )
-
     val activePlugins = mutableStateListOf<BasePlugin>()
 
     fun initialize() {
@@ -34,21 +29,39 @@ class PluginManager(
 
     fun requestDisplay(plugin: BasePlugin) {
         if (!activePlugins.contains(plugin)) {
-            // Simple priority: Notification > Media > Battery
-            val index = allPlugins.indexOfFirst { it.id == plugin.id }
-            var insertAt = activePlugins.size
-            for (i in activePlugins.indices) {
-                val activeIndex = allPlugins.indexOfFirst { it.id == activePlugins[i].id }
-                if (index < activeIndex) {
-                    insertAt = i
-                    break
-                }
-            }
+            val insertAt = calculateInsertIndex(activePlugins, plugin, allPlugins)
             activePlugins.add(insertAt, plugin)
         }
     }
 
     fun requestDismiss(plugin: BasePlugin) {
         activePlugins.remove(plugin)
+    }
+
+    companion object {
+        fun defaultPlugins(): List<BasePlugin> = listOf(
+            NotificationPlugin(),
+            MediaSessionPlugin(),
+            BatteryPlugin()
+        )
+
+        internal fun calculateInsertIndex(
+            activePlugins: List<BasePlugin>,
+            plugin: BasePlugin,
+            allPlugins: List<BasePlugin>
+        ): Int {
+            val pluginIndex = allPlugins.indexOfFirst { it.id == plugin.id }
+            if (pluginIndex == -1) return activePlugins.size
+
+            var insertAt = activePlugins.size
+            for (i in activePlugins.indices) {
+                val activeIndex = allPlugins.indexOfFirst { it.id == activePlugins[i].id }
+                if (activeIndex == -1 || pluginIndex < activeIndex) {
+                    insertAt = i
+                    break
+                }
+            }
+            return insertAt
+        }
     }
 }

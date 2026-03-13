@@ -13,6 +13,7 @@ import fr.angel.dynamicisland.model.ACTION_CLOSE
 import fr.angel.dynamicisland.model.ACTION_OPEN_CLOSE
 import fr.angel.dynamicisland.model.NOTIFICATION_POSTED
 import fr.angel.dynamicisland.model.NOTIFICATION_REMOVED
+import fr.angel.dynamicisland.model.sendInternalBroadcast
 import fr.angel.dynamicisland.island.IslandSettings
 
 
@@ -68,7 +69,7 @@ class NotificationService : NotificationListenerService() {
 		registerReceiver(mBroadcastReceiver, IntentFilter().apply {
 			addAction(ACTION_OPEN_CLOSE)
 			addAction(ACTION_CLOSE)
-		}, RECEIVER_EXPORTED)
+		}, RECEIVER_NOT_EXPORTED)
 	}
 
 	override fun onNotificationPosted(statusBarNotification: StatusBarNotification) {
@@ -93,7 +94,7 @@ class NotificationService : NotificationListenerService() {
 		Log.d("NotificationService", "Posted: $notifications")
 		Log.d("NotificationService", "Posted: ${notifications.size}")
 
-		sendBroadcast(Intent(NOTIFICATION_POSTED).apply {
+		sendInternalBroadcast(NOTIFICATION_POSTED) {
 			putExtra("id", statusBarNotification.id)
 			putExtra("package_name", statusBarNotification.packageName)
 			putExtra("category", notification.category)
@@ -104,7 +105,7 @@ class NotificationService : NotificationListenerService() {
 
 			putExtra("title", notification.extras.getString("android.title") ?: "Empty title")
 			putExtra("body", notification.extras.getString("android.text") ?: "Empty body")
-		})
+		}
 	}
 
 	override fun onNotificationRemoved(statusBarNotification: StatusBarNotification) {
@@ -115,9 +116,9 @@ class NotificationService : NotificationListenerService() {
 		Log.d("NotificationService", "Latest notification: ${notifications.firstOrNull()}")
 
 		// Send broadcast
-		sendBroadcast(Intent(NOTIFICATION_REMOVED).apply {
+		sendInternalBroadcast(NOTIFICATION_REMOVED) {
 			putExtra("id", statusBarNotification.id)
-		})
+		}
 	}
 
 	override fun onDestroy() {

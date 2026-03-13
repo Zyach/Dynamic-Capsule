@@ -100,7 +100,7 @@ class IslandOverlayService : AccessibilityService(), PluginHost {
 			addAction(SETTINGS_THEME_INVERTED)
 			addAction(ACTION_SCREEN_ON)
 			addAction(ACTION_SCREEN_OFF)
-		}, RECEIVER_EXPORTED)
+		}, RECEIVER_NOT_EXPORTED)
 
 		// Setup plugins (check if they are enabled)
 		pluginManager = PluginManager(this, this)
