@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,7 @@ import fr.angel.dynamicisland.ui.settings.SettingsDivider
 @Composable
 fun AboutSettingsScreen() {
 	val context = LocalContext.current
+	val disclosureText = stringResource(R.string.disclosure)
 
 	val manager = context.packageManager
 	val info = manager.getPackageInfo(
@@ -88,7 +90,7 @@ fun AboutSettingsScreen() {
 			TextSettingsItem(
 				icon = Icons.Default.VerifiedUser,
 				title = "Disclosure",
-				description = context.getString(R.string.disclosure),
+				description = disclosureText,
 			)
 			TextSettingsItem(
 				icon = Icons.Default.Policy,
