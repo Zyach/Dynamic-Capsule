@@ -51,6 +51,11 @@ jobs:
     if: github.event_name == 'push'
     needs: validate
     runs-on: ubuntu-latest
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
     steps:
       - name: Checkout
@@ -93,19 +98,19 @@ jobs:
           echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: Decode signing keystore
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
         shell: bash
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > release.keystore
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > release.keystore
 
       - name: Build release APK
         env:
           VERSION_CODE: ${{ steps.version.outputs.version_code }}
           VERSION_NAME: ${{ steps.version.outputs.version_name }}
           ANDROID_KEYSTORE_PATH: ${{ github.workspace }}/release.keystore
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD }}
         run: ./gradlew assembleRelease --stacktrace
 
       - name: Prepare release asset
